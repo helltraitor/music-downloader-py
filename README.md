@@ -4,6 +4,13 @@ Music downloader is a package for downloading and managing music on personal dev
 This project aims to be flexible (extendable) and user-friendly (simple for use).
 
 ## Features
+[❌] About
+
+[❌] Cookies
+- [❌] Delete
+- [❌] Get
+- [❌] Set
+
 [❌] Yandex
 - [❌] Downloading
 - - [❌] One by one
