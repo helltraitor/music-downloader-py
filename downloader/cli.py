@@ -10,22 +10,24 @@ This module contains `main` function that is the entry application point.
 Other functions must not be used.
 
 Examples:
-    | # Example of typical using
-    | from downloader import cli
-    |
-    |
-    | if __name__ == "__main__":
-    |     cli.main()
+    Example of typical using
 
-    | # Example of debugging
-    | import click import testing
-    |
-    | from downloader import cli
-    |
-    |
-    | if __name__ == "__main__":
-    |     runner = testing.CliRunner()
-    |     runner.invoke(cli.main, "cookies delete --domain example.com".split())
+    >>> from downloader import cli
+    >>>
+    >>>
+    >>> if __name__ == "__main__":
+    >>>     cli.main()
+
+    Example of debugging
+
+    >>> from click.testing import CliRunner
+    >>>
+    >>> from downloader import cli
+    >>>
+    >>>
+    >>> if __name__ == "__main__":
+    >>>     runner = CliRunner()
+    >>>     runner.invoke(cli.main, "cookies delete --domain example.com".split())
 """
 import datetime
 import logging
@@ -47,7 +49,7 @@ def main(debug: bool) -> None:
     \b
     Examples:
         | downloader cookies set --domain yandex.ru --key Session_id --value <CookieValue>
-        | downloader fetch <url> -c ignore -d `%USERPROFILE%/Downloads`
+        | downloader fetch <url> -c ignore -d %USERPROFILE%/Downloads
 
     \f
     Note (for documentation in `click` package):
