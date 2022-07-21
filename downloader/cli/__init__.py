@@ -30,3 +30,9 @@ Examples:
     >>>     runner.invoke(cli.main, "cookies delete --domain example.com".split())
 """
 from .main import main
+
+# Initialization imports
+#   Import in python executes code in the modules. Without these imports,
+#   `click` package will never know about set commands, arguments and options
+#   from these modules.
+from .cookies import cookies as _cookies

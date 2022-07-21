@@ -31,19 +31,26 @@ Examples:
 """
 import datetime
 import logging
-import pathlib
+
+from pathlib import Path
 
 import click
 
 
 @click.group()
+@click.option("--cookies",
+              default=None,
+              type=click.Path(file_okay=False, resolve_path=True, path_type=Path),
+              help="""Path to the cookies folder. By default it is using
+                      downloader/client/cookies""")
 @click.option("--debug",
               default=False,
               is_flag=True,
               show_default=True,
               help="""Runs the application in the debug mode.
                       Doesn't change the application behavior""")
-def main(debug: bool) -> None:
+@click.pass_context
+def main(context: click.Context, cookies: Path | None, debug: bool) -> None:
     """Music downloader allows to fetch, update and track music content.
 
     \b
@@ -57,12 +64,18 @@ def main(debug: bool) -> None:
         \f - truncate docs.
 
     Args:
+        context: `Click` package context that will be shared within other commands.
+        cookies: Expanded path of cookies directory (or None for default).
         debug: Boolean variable that influence on logs. Logs are located in:
             `music-downloader-py/downloader/logs`
     """
+    # Click context setup
+    context.ensure_object(dict)
+    context.obj["cookies"] = cookies
+
     # Logging setup
     log_filename = datetime.datetime.now().strftime("%Y-%m-%d %H_%M_%S.%f.log")
-    log_filepath = pathlib.Path(__file__).parent.parent / "logs" / log_filename
+    log_filepath = Path(__file__).parent.parent / "logs" / log_filename
 
     logging.basicConfig(
         filename=log_filepath,
@@ -104,53 +117,6 @@ def about(domain: str) -> None:
 
 
 @main.command()
-@click.option("--domain",
-              help="The domain of the cookie (e.g. `yandex.ru`)",
-              required=True)
-@click.option("--key",
-              help="The key of the cookie (e.g. `Session_id`)")
-@click.option("--value",
-              help="""The value of the cookie. In case if you have troubles for
-                      passing value try to wrap it in the double quotes `\"`""")
-@click.argument("action",
-                type=click.Choice(["DELETE", "GET", "SET"], case_sensitive=False))
-def cookies(action: str, domain: str, key: str | None, value: str | None) -> None:
-    """Preforms an indicated action on the cookie with domain, key and value.
-
-    \b
-    Accepts one positional argument from the following variants:
-        DELETE requires domain or both domain and key.
-            In the first case all cookies from the domain will be deleted.
-            In the second case only specified cookie will be removed.
-        GET requires domain and key.
-            Prints value into console (you can use pipes for further
-            processing).
-        SET requires domain, key and value.
-            In the case when cookie already exists, it's overrided by
-            the given value.
-
-    \b
-    Examples:
-        | downloader cookies delete --domain example.com
-        | downloader cookies delete --domain example.com --key SomeKey
-        | downloader cookies get --domain example.com
-        | downloader cookies get --domain example.com --key SomeKey
-        | downloader cookies set --domain example.com --key UserName --value Helltraitor
-
-    \f
-    Note (for documentation in `click` package):
-        \b - disables wrapping for docs
-        \f - truncate docs.
-
-    Args:
-        action: Action parameter from variants `DELETE`, `GET` or `SET`.
-        domain: The domain string (e.g. yandex.ru)
-        key: Optional cookie key (optional for delete).
-        value: Optional cookie value (used only by set).
-    """
-
-
-@main.command()
 @click.option("-l", "--limit",
               default=4,
               help="Limit of the number of tracks that can be downloaded at one time",
@@ -169,10 +135,10 @@ def cookies(action: str, domain: str, key: str | None, value: str | None) -> Non
 @click.option("-d", "--dest",
               help="""Destination folder. Path supports expanding so it's
                       fine to use `~/` or `%USERPROFILE%`""",
-              type=click.Path(file_okay=False, resolve_path=True, path_type=pathlib.Path),
+              type=click.Path(file_okay=False, resolve_path=True, path_type=Path),
               required=True)
 @click.argument("targets", nargs=-1)
-def fetch(targets: list[str], limit: int, conflict: str, dest: pathlib.Path) -> None:
+def fetch(targets: tuple[str], limit: int, conflict: str, dest: Path) -> None:
     """Fetches musics from all url targets applying tags and cover.
 
     \b
