@@ -6,9 +6,15 @@
 This module contains `cookies` function that is used by `click` package.
 Other functions are helpers that performs the specified action.
 """
+import asyncio
 import logging
 
+from http.cookies import SimpleCookie
+from pathlib import Path
+
 import click
+
+from downloader.client import CookiesStorage
 
 from .main import main
 
@@ -71,3 +77,148 @@ def cookies(context: click.Context, action: str,  # pylint: disable=locally-disa
         value: Optional cookie value (used only by set).
         force: Disables confirmation dialog when delete all domains or whole domain.
     """
+    if not isinstance(context.obj, dict):
+        Logger.error("Context.obj must have dict type, not a %s", type(context.obj))
+        raise TypeError(f"Context.obj must have dict type, not a {type(context.obj)}")
+
+    dirpath = context.obj.get("cookies", None)
+    if dirpath is not None and not isinstance(dirpath, Path):
+        Logger.error("Cookies in context must have Path type, not a %s", type(dirpath))
+        raise TypeError(f"Cookies in context must have Path type, not a {type(dirpath)}")
+
+    storage = CookiesStorage(dirpath)
+    match action:
+        case "DELETE":
+            if key is not None:
+                # SAFE: Key cannot be set without domain
+                asyncio.run(cookies_delete_exact(storage, domain, key))  # type: ignore
+            elif domain is not None:
+                if force or click.confirm("Delete the domain?"):
+                    asyncio.run(cookies_delete_domain(storage, domain))
+            else:
+                if force or click.confirm("Delete all domains?"):
+                    asyncio.run(cookies_delete_all(storage))
+
+        case "GET":
+            if key is not None:
+                # SAFE: Key cannot be set without domain
+                asyncio.run(cookies_get_exact(storage, domain, key))  # type: ignore
+            elif domain is not None:
+                asyncio.run(cookies_get_domain(storage, domain))
+            else:
+                asyncio.run(cookies_get_all(storage))
+
+        case "SET":
+            if value is not None:
+                # SAFE: Value cannot be set without both key and domain
+                asyncio.run(cookies_set(storage, domain, key, value))  # type: ignore
+            else:
+                Logger.error("Unable to set cookie without both domain, key and value")
+                raise ValueError("Unable to set cookie without both domain, key and value")
+
+        case _:
+            Logger.error("Command is not recognized %s", action)
+            raise ValueError(f"Cookie command {action} is not recognized")
+
+
+async def cookies_delete_all(storage: CookiesStorage) -> None:
+    """Deletes all domains from cookie storage.
+
+    This function can be used only as an example of preformed action.
+
+    Args:
+        storage: CookiesStorage instance.
+    """
+    await storage.load()
+    await storage.delete(*storage.domains())
+
+
+async def cookies_delete_domain(storage: CookiesStorage, domain: str) -> None:
+    """Deletes whole domain from cookie storage.
+
+    This function can be used only as an example of preformed action.
+
+    Args:
+        storage: CookiesStorage instance.
+        domain: Domain string (e.g. example.com).
+    """
+    await storage.load()
+    await storage.delete(domain)
+
+
+async def cookies_delete_exact(storage: CookiesStorage, domain: str, key: str) -> None:
+    """Deletes exact pair of the key and a value from storage.
+
+    This function can be used only as an example of preformed action.
+
+    Args:
+        storage: CookiesStorage instance.
+        domain: Domain string (e.g. example.com).
+        key: Key string from specified domain.
+    """
+    await storage.load()
+    if cookie := storage.domains().get(domain, None):
+        cookie.pop(key, None)
+        await storage.update({domain: cookie})
+
+
+async def cookies_get_all(storage: CookiesStorage) -> None:
+    """Prints all domains and their cookie's keys and values into stdout.
+
+    This function can be used only as an example of preformed action.
+
+    Args:
+        storage: CookiesStorage instance.
+    """
+    await storage.load()
+    for domain, cookie in storage.domains().items():
+        click.echo(f"Domain {domain}")
+        for key, morsel in cookie.items():
+            click.echo(f"\t{key}\t{morsel.value}")
+
+
+async def cookies_get_domain(storage: CookiesStorage, domain: str) -> None:
+    """Prints all cookie's keys and values from the domain into stdout.
+
+    This function can be used only as an example of preformed action.
+
+    Args:
+        storage: CookiesStorage instance.
+        domain: Domain string (e.g. example.com).
+    """
+    await storage.load()
+    cookie = storage.domains().get(domain, SimpleCookie())
+    for key, morsel in cookie.items():
+        click.echo(f"\t{key}\t{morsel.value}")
+
+
+async def cookies_get_exact(storage: CookiesStorage, domain: str, key: str) -> None:
+    """Prints the value of the key from the domain into stdout.
+
+    This function can be used only as an example of preformed action.
+
+    Args:
+        storage: CookiesStorage instance.
+        domain: Domain string (e.g. example.com).
+        key: Key string from specified domain.
+    """
+    await storage.load()
+    cookie = storage.domains().get(domain, SimpleCookie())
+    if morsel := cookie.get(key, None):
+        click.echo(morsel.value)
+
+
+async def cookies_set(storage: CookiesStorage, domain: str, key: str, value: str) -> None:
+    """Sets the specified value in the domain with a key.
+
+        This function can be used only as an example of preformed action.
+
+        Args:
+            storage: CookiesStorage instance.
+            domain: Domain string (e.g. example.com).
+            key: Key string from specified domain.
+    """
+    await storage.load()
+    cookie = storage.domains().get(domain, SimpleCookie())
+    cookie[key] = value
+    await storage.update({domain: cookie})
