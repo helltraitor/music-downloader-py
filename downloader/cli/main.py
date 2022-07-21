@@ -1,7 +1,7 @@
 # Copyright (c) 2022 Helltraitor <helltraitor@hotmail.com>
 #
 # This file is under MIT License (see full license text in music-downloader-py/LICENSE file)
-"""This module represents cli implementation via `click` package.
+"""This module represents entry point of cli implementation via `click` package.
 
 This module is not designed for using by other applications, packages,
 libraries, modules or scripts. But it is possible (see examples).
@@ -62,7 +62,7 @@ def main(debug: bool) -> None:
     """
     # Logging setup
     log_filename = datetime.datetime.now().strftime("%Y-%m-%d %H_%M_%S.%f.log")
-    log_filepath = pathlib.Path(__file__).parent / "logs" / log_filename
+    log_filepath = pathlib.Path(__file__).parent.parent / "logs" / log_filename
 
     logging.basicConfig(
         filename=log_filepath,
