@@ -130,3 +130,7 @@ dmypy.json
 
 # Idea IDE
 .idea/
+
+# Cookies
+!downloader/client/cookies/README.md
+downloader/client/cookies/*
