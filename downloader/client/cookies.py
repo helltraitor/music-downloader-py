@@ -209,6 +209,8 @@ class CookiesStorage:
         """Loads index file and its domains cookies from local storage.
 
         Firstly loads index file, then loads all domains cookies concurrently.
+        When index file is not exist does nothing (because it is fine to not
+        have nay files at the first launch).
 
         Examples:
             >>> from downloader.client import Client
@@ -218,13 +220,12 @@ class CookiesStorage:
             >>> await storage.load()
 
         Raises:
-            FileNotFoundError: When index file is not exist.
             TypeError: When deserialized object from index file is not a `dict`.
             TypeError: When deserialized object from cookie file is not a `SimpleCookie`.
         """
         if not self.__index.exists():
-            Logger.error("Index file is not exist at %s", self.__index)
-            raise FileNotFoundError(f"Index file is not exist at {self.__index}")
+            Logger.info("Index file is not exist at %s", self.__index)
+            return
 
         async with aiofiles.open(self.__index, mode="r") as file:
             domains = json.loads(await file.read())
