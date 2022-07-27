@@ -81,7 +81,7 @@ class CookiesStorage:
     """
     HOMEPATH = Path(__file__).parent / "cookies"
 
-    def __init__(self, dirpath: Path | None = None):
+    def __init__(self, dirpath: Path | None = None) -> None:
         """Creates a new CookiesStorage instance.
 
         Args:
