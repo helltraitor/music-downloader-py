@@ -1,7 +1,7 @@
 # Copyright (c) 2022 Helltraitor <helltraitor@hotmail.com>
 #
 # This file is under MIT License (see full license text in music-downloader-py/LICENSE file)
-"""This package contains Client implementation with cookie keep support.
+"""This package contains `Client` implementation with cookie keep support.
 
 `Client` class must be the only one way to make requests to the servers. This
 class limit active connection by its limit count and allow to save set cookies
