@@ -32,6 +32,7 @@ from .section import PartialSection
 
 Logger = logging.getLogger(__file__)
 
+# TODO: Alias to Self from Python 3.11
 Self: TypeAlias = "PartialRequestBuilder"
 
 
