@@ -72,8 +72,9 @@ class Domain(ABC):
     def __init_subclass__(cls, **kwargs) -> None:
         cls_name = cls.__name__
         if cls_name in ALL:
-            Logger.error("Domain %s name already registered", cls_name)
-            raise RuntimeError(f"Domain {cls_name} name already registered")
+            Logger.error("Domain %s already registered", cls_name)
+            raise RuntimeError(f"Domain {cls_name} already registered")
+        Logger.info("Domain %s was successfully registered", cls_name)
         ALL[cls_name] = cls
 
     def activate(self, options: list[str]) -> None:
