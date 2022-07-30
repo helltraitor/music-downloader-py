@@ -151,7 +151,7 @@ class PartialRequestBuilder:
             Self instance for chaining method call.
         """
         Logger.debug("Section %s was added")
-        self.__sections[kind] = self.__sections.get(kind, PartialSection)
+        self.__sections[kind] = self.__sections.get(kind, PartialSection())
         self.__sections[kind].update(section)
         return self
 
