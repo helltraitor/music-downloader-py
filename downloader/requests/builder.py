@@ -86,7 +86,7 @@ class PartialRequestBuilder:
     """
     __method: str
     __url: str | None = field(default=None)
-    __url_section: PartialSection = field(default_factory=PartialSection.empty)
+    __url_section: PartialSection = field(default_factory=PartialSection)
     __sections: dict[str, PartialSection] = field(default_factory=dict)
 
     def build(self) -> PartialRequest:
@@ -151,7 +151,7 @@ class PartialRequestBuilder:
             Self instance for chaining method call.
         """
         Logger.debug("Section %s was added")
-        self.__sections[kind] = self.__sections.get(kind, PartialSection.empty())
+        self.__sections[kind] = self.__sections.get(kind, PartialSection)
         self.__sections[kind].update(section)
         return self
 
@@ -187,5 +187,5 @@ class PartialRequestBuilder:
         """
         Logger.debug("Url %s was added", url)
         self.__url = url
-        self.__url_section = section or PartialSection.empty()
+        self.__url_section = section or PartialSection()
         return self

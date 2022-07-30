@@ -47,17 +47,9 @@ class PartialSection:
         on making request stage but other sections (such like params) are set
         on building request stage.
     """
-    automatic: dict[str, Callable[[], str]] = field(kw_only=True)
-    filled: dict[str, str] = field(kw_only=True)
-    required: set[str] = field(kw_only=True)
-
-    @staticmethod
-    def empty() -> Self:
-        """Creates an empty `PartialSection`
-
-        The equivalent is `PartialSection(automatic={}, filled={}, required=set())`
-        """
-        return PartialSection(automatic={}, filled={}, required=set())
+    automatic: dict[str, Callable[[], str]] = field(kw_only=True, default_factory=dict)
+    filled: dict[str, str] = field(kw_only=True, default_factory=dict)
+    required: set[str] = field(kw_only=True, default_factory=set)
 
     def ready(self) -> bool:
         """Checks if `PartialSection` ready to unwrap

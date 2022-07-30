@@ -24,7 +24,7 @@ Examples:
     >>> # Same as above
     >>> _alt_request = PartialRequest("GET",
     >>>                               "youtube.com",
-    >>>                               PartialSection.empty(),
+    >>>                               PartialSection(),
     >>>                               {})
     >>>
     >>> async with Client().create() as client:
@@ -76,7 +76,7 @@ class PartialRequest:
             >>> # Same as above
             >>> _alt_request = PartialRequest("GET",
             >>>                               "youtube.com",
-            >>>                               PartialSection.empty(),
+            >>>                               PartialSection(),
             >>>                               {})
             >>>
             >>> async with Client().create() as client:
@@ -187,7 +187,7 @@ class PartialRequest:
             PartialRequest copy (copy makes for reusing of original request).
         """
         sections = copy.deepcopy(self.__sections)
-        sections[kind] = sections.get(kind, PartialSection.empty())
+        sections[kind] = sections.get(kind, PartialSection())
         sections[kind].update(PartialSection(automatic=(automatic or {}),
                                              filled=(parameters or {}),
                                              required=set()))
