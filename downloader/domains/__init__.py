@@ -10,12 +10,16 @@ file in `ALL` global variable.
 import importlib
 import logging
 import pathlib
+import sys
 
 
 Logger = logging.getLogger(__file__)
 
+DOMAINS = pathlib.Path(__file__).parent
 
-for entity in pathlib.Path(__file__).parent.iterdir():
+sys.path.append(str(DOMAINS))
+
+for entity in DOMAINS.iterdir():
     if entity.name == "__init__.py":
         continue
 
@@ -23,3 +27,5 @@ for entity in pathlib.Path(__file__).parent.iterdir():
     #   automatically. So these modules (packages) just need to be imported.
     importlib.import_module(entity.name)
     Logger.info("Package %s was successfully imported", entity.name)
+
+sys.path.remove(str(DOMAINS))
