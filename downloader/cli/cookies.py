@@ -35,8 +35,11 @@ Logger = logging.getLogger(__file__)
 @click.argument("key", default=None, required=False)
 @click.argument("value", default=None, required=False)
 @click.pass_context
-def cookies(context: click.Context, action: str,  # pylint: disable=locally-disabled, too-many-arguments
-            domain: str | None, key: str | None, value: str | None,
+def cookies(context: click.Context,  # pylint: disable=locally-disabled, too-many-arguments
+            action: str,
+            domain: str | None,
+            key: str | None,
+            value: str | None,
             force: bool) -> None:
     """Preforms an indicated action on the cookie with domain, key and value.
 
@@ -70,7 +73,7 @@ def cookies(context: click.Context, action: str,  # pylint: disable=locally-disa
         \f - truncate docs.
 
     Args:
-        context: `Click` package context that may contain cookies directory.
+        context: `Click` package context that may contain extra information.
         action: Action parameter from variants `DELETE`, `GET` or `SET`.
         domain: Optional domain string (e.g. yandex.ru)
         key: Optional cookie key (optional for delete).
