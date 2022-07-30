@@ -26,6 +26,7 @@ Examples:
     >>>     async with downloads.open("track.mp3").to_track() as track:
     >>>         track.tags.add(id3.TIT2(encoding=3, text=["SomeTitle"]))
 """
+from .core import FileSystemConflict, IgnoredException
 from .descriptor import Descriptor
-from .filesystem import FileSystem, FileSystemConflict, IgnoredException
+from .filesystem import FileSystem
 from .sanitizer import sanitize

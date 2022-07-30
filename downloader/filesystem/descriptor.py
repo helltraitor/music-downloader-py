@@ -37,6 +37,8 @@ from aiofiles.threadpool.binary import AsyncBufferedReader
 # TODO: Wait mutagen update for using bytes buffer instead of private FileThing
 from mutagen._util import FileThing
 
+from .core import FileSystemConflict, IgnoredException
+
 
 Logger = logging.getLogger(__file__)
 
@@ -67,16 +69,18 @@ class Descriptor:
         >>>     async with downloads.open("track.mp3").to_track() as track:
         >>>         track.tags.add(id3.TIT2(encoding=3, text=["SomeTitle"]))
     """
-    def __init__(self, filepath: Path) -> None:
+    def __init__(self, filepath: Path, conflict: FileSystemConflict) -> None:
         """Creates a new `Descriptor` for the file in the filepath.
 
         See class documentation for more information.
 
         Args:
             filepath: A path to the file that will be opened.
+            conflict: An action to make when trying to open same file (as file).
         """
         Logger.debug("Descriptor is created for %s", filepath)
         self.__filepath = filepath
+        self.__conflict = conflict
 
     @contextlib.asynccontextmanager
     async def to_file(self) -> AsyncIterator[AsyncBufferedReader]:
@@ -103,6 +107,15 @@ class Descriptor:
         Yields:
             `AsyncBufferedReader` in the context.
         """
+        if self.__filepath.exists():
+            if self.__conflict is FileSystemConflict.ERROR:
+                Logger.error("File already exists at %s", self.__filepath)
+                raise FileExistsError(f"File already exists at {self.__filepath}")
+
+            if self.__conflict is FileSystemConflict.IGNORE:
+                Logger.info("Ignoring file at %s", self.__filepath)
+                raise IgnoredException(f"File ignored at {self.__filepath}")
+
         async with aiofiles.open(self.__filepath, "bw+") as file:
             Logger.debug("Borrow binary file %s", self.__filepath)
             yield file

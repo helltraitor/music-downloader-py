@@ -23,10 +23,10 @@ import contextlib
 import logging
 
 from collections.abc import AsyncIterator
-from enum import Enum
 from pathlib import Path
 from typing import TypeAlias
 
+from .core import FileSystemConflict
 from .descriptor import Descriptor
 from .sanitizer import sanitize
 
@@ -34,30 +34,6 @@ from .sanitizer import sanitize
 Logger = logging.getLogger(__file__)
 
 Self: TypeAlias = "FileSystem"
-
-
-class IgnoredException(Exception):
-    """`IgnoredException` exception indicates current file as ignored.
-
-    This exception class must be expected in outer classes (such like `Downloader`).
-    """
-
-
-class FileSystemConflict(Enum):
-    """`FileSystemConflict` represents an action when the same file already exists.
-
-    `ERROR` action makes FileSystem to raise a FileExistsError.
-        That will make whole application stop.
-
-    `IGNORE` action makes FileSystem to raise a IgnoredException.
-        That will allow to continue execution for other tasks.
-
-    `OVERRIDE` makes FileSystem to just override an existed file.
-        That will allow to continue execution for all tasks.
-    """
-    ERROR = 0
-    IGNORE = 1
-    OVERRIDE = 2
 
 
 class FileSystem:
@@ -220,12 +196,4 @@ class FileSystem:
         """
         filepath = self.__root / sanitize(filename)
         Logger.debug("Trying to open file at %s", filepath)
-        if filepath.exists():
-            if self.__conflict is FileSystemConflict.ERROR:
-                Logger.error("File already exists at %s", filepath)
-                raise FileExistsError(f"File already exists at {filepath}")
-
-            if self.__conflict is FileSystemConflict.IGNORE:
-                Logger.info("Ignoring file at %s", filepath)
-                raise IgnoredException(f"File ignored at {filepath}")
-        return Descriptor(filepath)
+        return Descriptor(filepath, self.__conflict)
