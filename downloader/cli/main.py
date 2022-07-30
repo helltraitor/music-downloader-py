@@ -117,11 +117,6 @@ def about(domain: str) -> None:
 
 
 @main.command()
-@click.option("-l", "--limit",
-              default=4,
-              help="Limit of the number of tracks that can be downloaded at one time",
-              type=click.IntRange(1, 8),
-              show_default=True)
 @click.option("-c", "--conflict",
               default="ERROR",
               help="""Action in the case when the destination folder contains
@@ -137,8 +132,16 @@ def about(domain: str) -> None:
                       fine to use `~/` or `%USERPROFILE%`""",
               type=click.Path(file_okay=False, resolve_path=True, path_type=Path),
               required=True)
+@click.option("-l", "--limit",
+              default=4,
+              help="Limit of the number of tracks that can be downloaded at one time",
+              type=click.IntRange(1, 8),
+              show_default=True)
+@click.option("-o", "--options",
+              help="Options that will be applied for domain that matches url host.",
+              multiple=True)
 @click.argument("targets", nargs=-1)
-def fetch(targets: tuple[str], limit: int, conflict: str, dest: Path) -> None:
+def fetch(targets: tuple[str], conflict: str, dest: Path, limit: int, options: tuple[str]) -> None:
     """Fetches musics from all url targets applying tags and cover.
 
     \b
@@ -152,6 +155,7 @@ def fetch(targets: tuple[str], limit: int, conflict: str, dest: Path) -> None:
         | downloader fetch <url> -d %USERPROFILE%/Downloads
         | downloader fetch <url> -d %USERPROFILE%/Downloads -c ignore
         | downloader fetch <url> -d %USERPROFILE%/Downloads -c ignore -l 8
+        | downloader fetch <url> -d %USERPROFILE%/Downloads -o HighQuality -o RussianLyrics
 
     \f
     Note (for documentation in `click` package):
@@ -161,11 +165,14 @@ def fetch(targets: tuple[str], limit: int, conflict: str, dest: Path) -> None:
     Args:
         targets: The list of url strings. Each one must be determined
             by host and process by host models.
-        limit: The download limit. Guarantees to be in [1, 8]
-            (by `click` package).
         conflict: Action to preform when file with the same name already
             exists. The one of the following variants `ERROR`, `IGNORE`,
             `OVERRIDE` (`ERROR` is default).
         dest: The destination folder for fetching music. Guarantees to be
             valid by `click` package.
+        limit: The download limit. Guarantees to be in [1, 8]
+            (by `click` package).
+        options: Any options tuple that must be supported by domains. These
+            options will be used for setup domain. See about `domain name`
+            for more information.
     """
