@@ -36,3 +36,4 @@ from .main import main
 #   `click` package will never know about set commands, arguments and options
 #   from these modules.
 from .cookies import cookies as _cookies
+from .fetcher import fetch as _fetch
