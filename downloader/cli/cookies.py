@@ -217,6 +217,7 @@ async def cookies_set(storage: CookiesStorage, domain: str, key: str, value: str
             storage: CookiesStorage instance.
             domain: Domain string (e.g. example.com).
             key: Key string from specified domain.
+            value: Value of specified key.
     """
     await storage.load()
     cookie = storage.domains().get(domain, SimpleCookie())
