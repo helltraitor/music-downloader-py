@@ -44,6 +44,6 @@ Examples:
     >>>         async with request.make(session) as response:
     >>>             pass  # All is fine
 """
-from builder import PartialRequestBuilder
-from partial import PartialRequest
-from section import PartialSection
+from .builder import PartialRequestBuilder
+from .partial import PartialRequest
+from .section import PartialSection
