@@ -4,6 +4,9 @@
 """Music downloader is a package/application for easy fetch, update and track music.
 
 TODO:
-    - Add documentation in this docstrings according to added abilities
-    - Add cookies storage
+    - Add documentation in this docstrings
 """
+# Initialization imports
+#   Import in python executes code in the modules. Without this import,
+#   domains will never be loaded.
+from . import domains
