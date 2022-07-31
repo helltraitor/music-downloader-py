@@ -15,11 +15,11 @@ import sys
 
 Logger = logging.getLogger(__file__)
 
-DOMAINS = pathlib.Path(__file__).parent
+EXTENSIONS = pathlib.Path(__file__).parent
 
-sys.path.append(str(DOMAINS))
+sys.path.append(str(EXTENSIONS))
 
-for entity in DOMAINS.iterdir():
+for entity in EXTENSIONS.iterdir():
     if entity.name == "__init__.py":
         continue
 
@@ -28,4 +28,4 @@ for entity in DOMAINS.iterdir():
     importlib.import_module(entity.name)
     Logger.info("Package %s was successfully imported", entity.name)
 
-sys.path.remove(str(DOMAINS))
+sys.path.remove(str(EXTENSIONS))

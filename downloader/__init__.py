@@ -8,5 +8,5 @@ TODO:
 """
 # Initialization imports
 #   Import in python executes code in the modules. Without this import,
-#   domains will never be loaded.
-from . import domains
+#   extensions will never be loaded.
+from . import extensions

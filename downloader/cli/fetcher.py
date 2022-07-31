@@ -14,9 +14,9 @@ from pathlib import Path
 
 import click
 
-from downloader import domain
+from downloader import domains
 from downloader.client import Client, CookiesStorage, RateLimit
-from downloader.domain import Fetchable
+from downloader.domains import Fetchable
 from downloader.fetcher import Fetcher, Target
 from downloader.filesystem import FileSystem, FileSystemConflict
 
@@ -105,7 +105,7 @@ def fetch(context: click.Context,  # pylint: disable=locally-disabled, too-many-
         raise ValueError(f"Limit {limit} is out of bounds")
 
     separated = {}
-    for name, subclass in domain.ALL.items():
+    for name, subclass in domains.ALL.items():
         acceptable = {target for target in targets if subclass.match(target)}
         if not acceptable:
             continue

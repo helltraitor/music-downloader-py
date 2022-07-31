@@ -8,7 +8,7 @@ Also, `Fetchable` protocol is defined here. This protocol allows to fetch items
 from this domain.
 
 Examples:
-    >>> from downloader.domain import Domain, Fetchable
+    >>> from downloader.domains import Domain, Fetchable
     >>> from downloader.fetcher import Downloadable
     >>>
     >>>
@@ -51,7 +51,7 @@ class Domain(ABC):
     not implements necessary protocol, execution interrupts.
 
     Examples:
-        >>> from downloader.domain import Domain, Fetchable
+        >>> from downloader.domains import Domain, Fetchable
         >>> from downloader.fetcher import Downloadable
         >>>
         >>>
@@ -111,7 +111,7 @@ class Fetchable(Protocol):  # pylint: disable=locally-disabled, too-few-public-m
     and be `Domain` subclass.
 
     Example:
-        >>> from downloader.domain import Domain, Fetchable
+        >>> from downloader.domains import Domain, Fetchable
         >>> from downloader.fetcher import Downloadable
         >>>
         >>>
