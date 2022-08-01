@@ -194,6 +194,8 @@ class FileSystem:
         Returns:
             A new `Descriptor` that allows to use a file as file or track.
         """
+        # Ensures that indicated path exists
+        self.__root.mkdir(exist_ok=True, parents=True)
         filepath = self.__root / sanitize(filename)
         Logger.debug("Trying to open file at %s", filepath)
         return Descriptor(filepath, self.__conflict)
