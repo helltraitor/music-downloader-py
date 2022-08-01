@@ -16,6 +16,7 @@ Examples:
     >>>     # Alternative
     >>>     await Fetcher(client).fetch_all([Downloadable(), Expandable()])
 """
+from dataclasses import dataclass
 from typing import Protocol, runtime_checkable, TypeAlias, Union
 
 from aiohttp.client import ClientSession
@@ -24,6 +25,16 @@ from downloader.filesystem import FileSystem
 
 
 Target: TypeAlias = Union["Downloadable", "Expandable"]
+
+
+@dataclass
+class ExpandedTargets:
+    """`ExpandedTargets` represents a pair of targets and its root directory.
+
+    This class is used only as container for a more convenient typing.
+    """
+    root: FileSystem
+    targets: list[Target]
 
 
 @runtime_checkable
@@ -89,8 +100,7 @@ class Expandable(Protocol):
         >>>     # Or any other class that implements this protocol
         >>>     await Fetcher(client).fetch(Expandable())
     """
-    async def expand(self, session: ClientSession, system: FileSystem)\
-            -> tuple[FileSystem, list[Target]]:
+    async def expand(self, session: ClientSession, system: FileSystem) -> list[ExpandedTargets]:
         """Expand method allows expanding one complicated target into several more simple.
 
         This method allows artists to expand into albums, and albums and playlists
@@ -108,15 +118,14 @@ class Expandable(Protocol):
             >>>         self.id = id
             >>>         self.name: str | None = None
             >>>
-            >>>     async def expand(self, session: ClientSession, system: FileSystem)\
-            >>>             -> tuple[FileSystem, list[Target]]:
+            >>>     async def expand(self, session: ClientSession, system: FileSystem) -> list[ExpandedTargets]:
             >>>         if self.name is None:
             >>>             raise RuntimeError("Prepare method was not called")
             >>>
             >>>         # Making request and collect all targets
             >>>         targets = []
             >>>         async with system.into(self.name) as subsystem:
-            >>>             return subsystem, targets
+            >>>             return [ExpandedTargets(subsystem, targets)]
 
         Args:
             session: The `ClientSession` instance that can be used in the internal
@@ -126,9 +135,10 @@ class Expandable(Protocol):
                 which must not be suppressed (caught by using code).
 
         Returns:
-            The tuple of `FileSystem` and list of `Target`. The first one allows
-            changing working directory. The second one is about targets that
-            will be saved in the `FileSystem` root.
+            The list of tuples of `FileSystem` and list of `Target`. The list allows
+            to download targets in several subfolders (e.g. CD1, CD2, and so on).
+            `FileSystem` allows changing working directory. The second one is about
+            targets that will be saved in the `FileSystem` root.
         """
 
     async def prepare(self, session: ClientSession) -> None:

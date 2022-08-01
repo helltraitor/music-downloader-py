@@ -27,4 +27,4 @@ Examples:
     >>>     await Fetcher(client).fetch_all([Downloadable(), Expandable()])
 """
 from .fetcher import Fetcher
-from .targets import Downloadable, Expandable, Target
+from .targets import Downloadable, Expandable, ExpandedTargets, Target

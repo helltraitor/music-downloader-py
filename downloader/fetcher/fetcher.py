@@ -88,10 +88,11 @@ class Fetcher:
 
         if isinstance(target, Expandable):
             async with self.__client.session() as session:
-                subsystem, targets = await target.expand(session, system)
+                expanded = await target.expand(session, system)
 
             Logger.info("Target %s was successfully expanded", target)
-            await self.fetch_all(targets, subsystem)
+            tasks = [self.fetch_all(group.targets, group.root) for group in expanded]
+            await asyncio.gather(*tasks)
 
         elif isinstance(target, Downloadable):
             try:
