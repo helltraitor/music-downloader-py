@@ -88,9 +88,13 @@ class Fetcher:
 
         if isinstance(target, Expandable):
             async with self.__client.session() as session:
-                expanded = await target.expand(session, system)
+                try:
+                    expanded = await target.expand(session, system)
+                except IgnoredException:
+                    Logger.info("Expandable target %s is ignored", target)
+                    return
 
-            Logger.info("Target %s was successfully expanded", target)
+            Logger.info("Expandable target %s was successfully expanded", target)
             tasks = [self.fetch_all(group.targets, group.root) for group in expanded]
             await asyncio.gather(*tasks)
 
@@ -98,10 +102,10 @@ class Fetcher:
             try:
                 async with self.__client.session() as session:
                     await target.download(session, system)
-            except IgnoredException as exc:
-                Logger.info("Target %s already exists, ignoring...", target, exc_info=exc)
+            except IgnoredException:
+                Logger.info("Downloadable target %s is ignored", target)
             else:
-                Logger.info("Target %s was successfully downloaded", target)
+                Logger.info("Downloadable target %s was successfully downloaded", target)
 
     async def fetch_all(self, targets: list[Target], system: FileSystem) -> None:
         """Fetches all targets concurrently via `fetch` method.
