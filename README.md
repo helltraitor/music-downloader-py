@@ -5,31 +5,34 @@ This project aims to be flexible (extendable) and user-friendly (simple for use)
 
 ## Features
 ### About
-- [ ] About
-- - [ ] Application
-- - [ ] Yandex
+About command allows fetching information about entire application or some concrete domain.
+
+Example:
+    downloader about yandex
 
 ### Cookies
-- [x] Cookies
-- - [x] Delete
-- - [x] Get
-- - [x] Set
+Cookies command allows to set, get or delete cookies, that is important for fetcher.
 
-### Domains
-- [ ] Yandex
-- - [ ] Downloading
-- - - [ ] One by one
-- - - [ ] albums
-- - - [ ] playlists
-- - - [ ] artists
-- - - [ ] labels
+Note that some values or keys may not be set properly in the shell. You can use `""`
+for wrapping keys and values to fix it.
 
-- - [ ] Updating
-- - - [ ] albums
-- - - [ ] playlists
-- - - [ ] artists
-- - - [ ] labels
+Example:
+    downloader cookies set yandex.ru Session_id "value_from_cookies"
 
-- - [ ] Tracking
-- - - [ ] artists
-- - - [ ] labels
+### Fetch
+This is all about. Fetch allows to download required resource from domain.
+
+Example:
+    downloader fetch https://music.yandex.ru/artist/1480281 -d %USERPROFILE%/Downloads
+
+For updating, you can use `-c ignore`. That allows to skip tracks with the same names.
+And there is the problem. Naming. It is easier to redownload all library instead of updating.
+(When you have previous library. But if you fetch tracks via downloader, you can just use flag
+above.)
+
+I strongly believe that in yandex domain tracks will have same principles of naming that will
+allow simple updating of tracks.
+
+## Contributing
+It's open project, just make PR.
+If you have any proposals, just create an issue.
