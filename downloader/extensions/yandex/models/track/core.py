@@ -178,8 +178,12 @@ class Track(Downloadable):
         Args:
             session: The client session instance that will be used for making requests.
         """
+        # Force using track relative to current album.
+        #   Otherwise, is possible to receive something like 03 / 5
+        #   (because track have other album with 28 total tracks)
         request = (api.TRACK_INFO_REQUEST
-                      .with_section_fields("params", parameters={"track": self.id}))
+                   .with_section_fields("params", parameters={"track": self.id + ":" + self.album}))
+
         async with request.make(session) as response:
             if response.status != 200:
                 Logger.error("Bad response %s for %s", response.status, self)
