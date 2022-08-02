@@ -65,4 +65,5 @@ class Artist(Expandable):
         self.name = meta_info["artist"]["name"]
 
         for album in meta_info["albums"]:
-            self.albums.append(Album(album["id"], alone=False, quality=self.quality))
+            # Album["id"] is integer
+            self.albums.append(Album(str(album["id"]), alone=False, quality=self.quality))
