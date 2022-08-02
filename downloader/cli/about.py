@@ -27,9 +27,9 @@ def about(domain: str) -> None:
     \b
     Examples:
         | downloader about
-        | downloader about yandex.ru
-        | downloader about youtube.com
-        | downloader about example.com
+        | downloader about yandex
+        | downloader about youtube
+        | downloader about example
 
     \b
     Latest (or any other unknown domains) must display:
