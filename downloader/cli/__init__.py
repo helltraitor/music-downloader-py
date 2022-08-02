@@ -35,5 +35,6 @@ from .main import main
 #   Import in python executes code in the modules. Without these imports,
 #   `click` package will never know about set commands, arguments and options
 #   from these modules.
+from .about import about as _about
 from .cookies import cookies as _cookies
 from .fetcher import fetch as _fetch

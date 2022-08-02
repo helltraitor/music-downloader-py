@@ -81,36 +81,3 @@ def main(context: click.Context, cookies: Path | None, debug: bool) -> None:
         filename=log_filepath,
         format="%(asctime)s %(levelname)7s: %(filename)s %(funcName)s: %(message)s",
         level=logging.DEBUG if debug else logging.INFO)
-
-
-@main.command()
-@click.argument("domain", default="")
-def about(domain: str) -> None:
-    """Provides information about specified domain or entire package.
-
-    \b
-    Displays information from __init__.py file of supported module,
-    or displays the standard message. This allows user to understand
-    which domains are supported.
-    Also is possible to display information about package/application
-    by ignoring domain argument (see example).
-
-    \b
-    Examples:
-        | downloader about
-        | downloader about yandex.ru
-        | downloader about youtube.com
-        | downloader about example.com
-
-    \b
-    Latest (or any other unknown domains) must display:
-        `example.com domain is not supported.`
-
-     \f
-    Note (for documentation in `click` package):
-        \b - disables wrapping for docs
-        \f - truncate docs.
-
-    Args:
-        domain: The domain string value (e.g. yandex.ru)
-    """
