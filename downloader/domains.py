@@ -75,7 +75,7 @@ class Domain(ABC):
             Logger.error("Domain %s already registered", cls_name)
             raise RuntimeError(f"Domain {cls_name} already registered")
         Logger.info("Domain %s was successfully registered", cls_name)
-        ALL[cls_name] = cls
+        ALL[cls_name.lower()] = cls
 
     def activate(self, options: list[str]) -> None:
         """Setups the domain instance and activate supported options.
