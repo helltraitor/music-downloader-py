@@ -8,6 +8,7 @@ This project aims to be flexible (extendable) and user-friendly (simple for use)
 About command allows fetching information about entire application or some concrete domain.
 
 Example:
+
     downloader about yandex
 
 ### Cookies
@@ -17,12 +18,14 @@ Note that some values or keys may not be set properly in the shell. You can use 
 for wrapping keys and values to fix it.
 
 Example:
+
     downloader cookies set yandex.ru Session_id "value_from_cookies"
 
 ### Fetch
 This is all about. Fetch allows to download required resource from domain.
 
 Example:
+
     downloader fetch https://music.yandex.ru/artist/1480281 -d %USERPROFILE%/Downloads
 
 For updating, you can use `-c ignore`. That allows to skip tracks with the same names.
