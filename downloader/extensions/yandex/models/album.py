@@ -80,5 +80,6 @@ class Album(Expandable):
             self.title = artists + " - " + self.title  # type: ignore
 
         for volume in meta_info["volumes"]:
-            self.volumes.append([Track(self.id, track["id"], alone=False, quality=self.quality)
-                                 for track in volume])
+            self.volumes.append([
+                Track(self.id, str(track["id"]), alone=False, quality=self.quality) for track in volume
+            ])

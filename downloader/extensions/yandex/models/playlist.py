@@ -66,4 +66,4 @@ class Playlist(Expandable):
         self.name = meta_info["playlist"]["title"]
 
         for track in meta_info["playlist"]["tracks"]:
-            self.tracks.append(Track(track["albums"][0]["id"], track["id"], quality=self.quality))
+            self.tracks.append(Track(str(track["albums"][0]["id"]), str(track["id"]), quality=self.quality))

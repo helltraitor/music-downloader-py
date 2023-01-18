@@ -56,4 +56,4 @@ class Label(Expandable):
         self.name = meta_info["label"]["name"]
 
         for album in meta_info["albums"]:
-            self.albums.append(Album(album["id"], quality=self.quality))
+            self.albums.append(Album(str(album["id"]), quality=self.quality))
