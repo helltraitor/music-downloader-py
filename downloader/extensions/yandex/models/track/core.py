@@ -33,7 +33,7 @@ class Track(Downloadable):
     file: TrackFile | None = field(default=None, repr=False)
     meta: TrackMeta | None = field(default=None, repr=False)
     available: bool = False
-    alone: bool = False
+    alone: bool = True
     quality: TrackQuality = field(default=TrackQuality.STANDARD, repr=False)
 
     @staticmethod
