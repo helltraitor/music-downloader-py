@@ -40,6 +40,7 @@ class Yandex(Domain, Fetchable):
     """
     def __init__(self) -> None:
         self.quality = TrackQuality.STANDARD
+        self.displace = "_"
 
     @staticmethod
     def match(url: str) -> bool:
@@ -53,12 +54,15 @@ class Yandex(Domain, Fetchable):
                 case _:
                     Logger.warning("Option %s is not supported by Yandex domain", option)
 
+        self.displace = kwargs_options.get("Displace", "_")
+
     def fetch_from(self, url: str) -> Target:
         for item in FETCH_MODELS:
             if (target := item.from_url(url)) is None:
                 continue
 
             target.quality = self.quality
+            target.displace = self.displace
             return target
 
         Logger.error("Yandex domain unable to recognize url: %s", url)

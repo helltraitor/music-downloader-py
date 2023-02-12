@@ -6,6 +6,7 @@ from __future__ import annotations
 import logging
 import re
 
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -30,6 +31,7 @@ class Album(Expandable):
     alone: bool = True
     available: bool = False
     quality: TrackQuality = field(default=TrackQuality.STANDARD, repr=False)
+    displace: str = "_"
 
     @staticmethod
     def from_url(url: str) -> Optional[Album]:
@@ -38,7 +40,7 @@ class Album(Expandable):
             return Album(album.group(1))
         return None
 
-    async def expand(self, session: ClientSession, system: FileSystem) -> list[ExpandedTargets]:
+    async def expand(self, session: ClientSession, system: FileSystem) -> Sequence[ExpandedTargets]:
         if not self.available:
             Logger.warning("Album %s is not available", self)
 
@@ -50,12 +52,12 @@ class Album(Expandable):
             raise RuntimeError(f"{self} wasn't prepared by `prepare` method")
 
         expanded = []
-        async with system.into(self.title) as album:
+        async with system.into(self.title, self.displace) as album:
             if len(self.volumes) == 1:
                 return [ExpandedTargets(album, self.volumes[0])]
 
             for part, tracks in enumerate(self.volumes, 1):
-                async with album.into(f"CD{part}") as subdir:
+                async with album.into(f"CD{part}", self.displace) as subdir:
                     expanded.append(ExpandedTargets(subdir, tracks))
         return expanded
 
@@ -71,15 +73,16 @@ class Album(Expandable):
 
         self.available = meta_info["available"]
 
-        self.title = meta_info["title"]
+        self.title = str(meta_info["title"])
         if "version" in meta_info:
             self.title = f"{self.title} ({meta_info['version']})"
 
         if self.alone:
             artists = ", ".join((artist["name"] for artist in meta_info["artists"]))
-            self.title = artists + " - " + self.title  # type: ignore
+            self.title = artists + " - " + self.title
 
         for volume in meta_info["volumes"]:
             self.volumes.append([
-                Track(self.id, str(track["id"]), alone=False, quality=self.quality) for track in volume
+                Track(self.id, str(track["id"]), alone=False, quality=self.quality, displace=self.displace)
+                for track in volume
             ])

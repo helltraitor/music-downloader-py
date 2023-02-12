@@ -28,6 +28,7 @@ class Label(Expandable):
     albums: list[Album] = field(default_factory=list)
     name: str | None = field(default=None)  # name
     quality: TrackQuality = field(default=TrackQuality.STANDARD, repr=False)
+    displace: str = "_"
 
     @staticmethod
     def from_url(url: str) -> Optional[Label]:
@@ -40,7 +41,7 @@ class Label(Expandable):
             Logger.error("%s wasn't prepared by `prepare` method", self)
             raise RuntimeError(f"{self} wasn't prepared by `prepare` method")
 
-        async with system.into(self.name) as artist:
+        async with system.into(self.name, self.displace) as artist:
             return [ExpandedTargets(artist, self.albums)]
 
     async def prepare(self, session: ClientSession) -> None:
@@ -56,4 +57,4 @@ class Label(Expandable):
         self.name = meta_info["label"]["name"]
 
         for album in meta_info["albums"]:
-            self.albums.append(Album(str(album["id"]), quality=self.quality))
+            self.albums.append(Album(str(album["id"]), quality=self.quality, displace=self.displace))

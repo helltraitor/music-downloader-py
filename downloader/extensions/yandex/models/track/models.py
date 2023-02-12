@@ -37,6 +37,10 @@ class TrackAlbum(BaseModel):
             self.title = f"{self.title} ({self.version})"
 
     def apply(self, file: FileType) -> None:
+        if file.tags is None:
+            Logger.error("FileType hasn't provided tags. At least empty tags must be set")
+            raise RuntimeError("FileType.tags attribute is None, but must be at least an empty instance")
+
         self.post_init()
 
         # The chosen one album translates all information in track
@@ -87,6 +91,10 @@ class TrackInfo(BaseModel):
             self.title = f"{self.title} ({self.version})"
 
     def apply(self, file: FileType) -> None:
+        if file.tags is None:
+            Logger.error("FileType hasn't provided tags. At least empty tags must be set")
+            raise RuntimeError("FileType.tags attribute is None, but must be at least an empty instance")
+
         self.post_init()
 
         artists = [artist.name for artist in self.artists if not artist.composer] or [""]
@@ -151,6 +159,10 @@ class TrackCover(BaseModel):
             Logger.warning("Apply was calling for track but no cover provided")
             return
 
+        if file.tags is None:
+            Logger.error("FileType hasn't provided tags. At least empty tags must be set")
+            raise RuntimeError("FileType.tags attribute is None, but must be at least an empty instance")
+
         file.tags.add(id3.APIC(
             data=self.content,
             desc="Cover",
@@ -182,17 +194,24 @@ class TrackLyrics(BaseModel):
         """
         if self.text is None:
             Logger.warning("Apply was calling for track but no lyrics provided")
+            return
+
         if self.authors is None:
             Logger.warning("Apply was calling for track but no lyrics authors provided")
+            return
+
+        if file.tags is None:
+            Logger.error("FileType hasn't provided tags. At least empty tags must be set")
+            raise RuntimeError("FileType.tags attribute is None, but must be at least an empty instance")
 
         file.tags.add(id3.TEXT(
             encoding=3,  # 3 for UTF-8
             # see mutagen _specs.py
-            text=(self.authors or "").split(", ")))
+            text=self.authors.split(", ")))
         file.tags.add(id3.USLT(
             encoding=3,  # 3 for UTF-8
             # see mutagen _specs.py
-            text=(self.text or "")))
+            text=self.text))
 
 
 @dataclass

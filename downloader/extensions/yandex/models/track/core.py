@@ -11,7 +11,8 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from aiohttp import ClientSession
-from defusedxml import ElementTree
+# Note: Defused xml doesn't provide types for mypy
+from defusedxml import ElementTree  # type: ignore
 
 from downloader.fetcher import Downloadable
 from downloader.filesystem import FileSystem, IgnoredException
@@ -33,6 +34,7 @@ class Track(Downloadable):
     available: bool = False
     alone: bool = True
     quality: TrackQuality = field(default=TrackQuality.STANDARD, repr=False)
+    displace: str = "_"
 
     @staticmethod
     def from_url(url: str) -> Optional[Track]:
@@ -54,7 +56,8 @@ class Track(Downloadable):
             raise RuntimeError(f"{self} wasn't prepared by `prepare` method")
 
         # Receiving and processing download info
-        src = self.file.resource.removeprefix("//")
+        # Safe: Value self.file was checked above
+        src = self.file.resource.removeprefix("//")  # type: ignore
         request = (api.TRACK_DOWN_REQUEST
                       .with_url_fields(parameters={"src": src}))
 
@@ -81,12 +84,13 @@ class Track(Downloadable):
                       .with_section_fields("params", parameters={
                           "track-id": self.id}))
 
-        title = self.meta.info.title_from(self.alone)
-        filename = title + "." + self.file.codec
+        # Safe: Values self.meta, self.file were checked above
+        title = self.meta.info.title_from(self.alone)  # type: ignore
+        filename = title + "." + self.file.codec  # type: ignore
 
         # Trying to open file before downloading, because file may exist
         #  In that case IgnoredException or FileExistError occurs
-        async with system.open(filename).to_file() as file:
+        async with system.open(filename, self.displace).to_file() as file:
             async with request.make(session) as response:
                 if response.status != 200:
                     Logger.error("Bad response %s for %s", response.status, self)
@@ -102,8 +106,9 @@ class Track(Downloadable):
         print("DONE", title)
 
         Logger.info("Begin applying tags for track %s", title)
-        async with system.open(filename).to_track() as track:
-            self.meta.apply(track)
+        async with system.open(filename, self.displace).to_track() as track:
+            # Safe: Values self.meta, self.file were checked above
+            self.meta.apply(track)  # type: ignore
 
     async def prepare(self, session: ClientSession) -> None:
         # Both under must have been prepared in following order:
@@ -120,11 +125,12 @@ class Track(Downloadable):
         Args:
             session: The client session instance that will be used for making requests.
         """
-        if not all((self.meta, self.meta.cover)):
+        if self.meta is None or self.meta.cover is None:
             Logger.error("%s wasn't prepared by `prepare_meta` method", self)
             raise RuntimeError(f"{self} wasn't prepared by `prepare_meta` method")
 
-        src = self.meta.cover.resource.replace("%%", self.quality.cover())
+        # Safe: Values self.meta was checked above
+        src = self.meta.cover.resource.replace("%%", self.quality.cover())  # type: ignore
         request = (api.TRACK_COVER_REQUEST
                       .with_url_fields(parameters={"src": src}))
 
@@ -142,8 +148,9 @@ class Track(Downloadable):
                 Logger.error("Bad content type `application/octet-stream` (RFC2616) for %s", self)
                 raise RuntimeError("Bad content type `application/octet-stream` (RFC2616)")
 
-            self.meta.cover.content = await response.read()
-            self.meta.cover.mimetype = response.headers["CONTENT-TYPE"]
+            # Safe: Values self.meta was checked above
+            self.meta.cover.content = await response.read()  # type: ignore
+            self.meta.cover.mimetype = response.headers["CONTENT-TYPE"]  # type: ignore
         Logger.info("Cover was successfully prepared for %s", self)
 
     async def prepare_file(self, session: ClientSession) -> None:
@@ -161,7 +168,7 @@ class Track(Downloadable):
 
         request = (api.TRACK_META_REQUEST
                       .with_url_fields(parameters={"album": self.album, "track": self.id})
-                      .with_section_fields("params", parameters={"hq": self.quality.hq()}))
+                      .with_section_fields("params", parameters={"hq": str(self.quality.hq())}))
 
         async with request.make(session) as response:
             if response.status != 200:

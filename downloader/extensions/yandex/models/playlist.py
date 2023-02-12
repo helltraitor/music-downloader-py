@@ -30,6 +30,7 @@ class Playlist(Expandable):
     name: str | None = field(default=None)
     available: bool = False
     quality: TrackQuality = field(default=TrackQuality.STANDARD)
+    displace: str = "_"
 
     @staticmethod
     def from_url(url: str) -> Optional[Playlist]:
@@ -49,7 +50,7 @@ class Playlist(Expandable):
             Logger.error("%s wasn't prepared by `prepare` method", self)
             raise RuntimeError(f"{self} wasn't prepared by `prepare` method")
 
-        async with system.into(self.name) as playlist:
+        async with system.into(self.name, self.displace) as playlist:
             return [ExpandedTargets(playlist, self.tracks)]
 
     async def prepare(self, session: ClientSession) -> None:
