@@ -25,6 +25,8 @@ Examples:
 import asyncio
 import logging
 
+from collections.abc import Sequence
+
 from downloader.client import Client
 from downloader.filesystem import FileSystem, IgnoredException
 
@@ -107,7 +109,7 @@ class Fetcher:
             else:
                 Logger.info("Downloadable target %s was successfully downloaded", target)
 
-    async def fetch_all(self, targets: list[Target], system: FileSystem) -> None:
+    async def fetch_all(self, targets: Sequence[Target], system: FileSystem) -> None:
         """Fetches all targets concurrently via `fetch` method.
 
         See `fetch` method for more information.

@@ -16,6 +16,7 @@ Examples:
     >>>     # Alternative
     >>>     await Fetcher(client).fetch_all([Downloadable(), Expandable()])
 """
+from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Protocol, runtime_checkable, TypeAlias, Union
 
@@ -34,7 +35,7 @@ class ExpandedTargets:
     This class is used only as container for a more convenient typing.
     """
     root: FileSystem
-    targets: list[Target]
+    targets: Sequence[Target]
 
 
 @runtime_checkable
@@ -100,7 +101,7 @@ class Expandable(Protocol):
         >>>     # Or any other class that implements this protocol
         >>>     await Fetcher(client).fetch(Expandable())
     """
-    async def expand(self, session: ClientSession, system: FileSystem) -> list[ExpandedTargets]:
+    async def expand(self, session: ClientSession, system: FileSystem) -> Sequence[ExpandedTargets]:
         """Expand method allows expanding one complicated target into several more simple.
 
         This method allows artists to expand into albums, and albums and playlists
@@ -118,7 +119,7 @@ class Expandable(Protocol):
             >>>         self.id = id
             >>>         self.name: str | None = None
             >>>
-            >>>     async def expand(self, session: ClientSession, system: FileSystem) -> list[ExpandedTargets]:
+            >>>     async def expand(self, session: ClientSession, system: FileSystem) -> Sequence[ExpandedTargets]:
             >>>         if self.name is None:
             >>>             raise RuntimeError("Prepare method was not called")
             >>>
