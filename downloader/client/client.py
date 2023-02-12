@@ -45,6 +45,8 @@ Examples:
     >>>     async with client.session() as _session:
     >>>         pass  # Same cookies, because these were saved
 """
+from __future__ import annotations
+
 import asyncio
 import contextlib
 import logging
@@ -52,16 +54,13 @@ import typing
 
 from collections.abc import AsyncIterator
 from http.cookies import SimpleCookie
-from typing import Literal, TypeAlias
+from typing import Literal
 
 from aiohttp.client import ClientSession
 from yarl import URL
 
 from .cookies import CookiesStorage
 
-
-# TODO: Alias to Self from Python 3.11
-Self: TypeAlias = "Client"
 
 Logger = logging.getLogger(__file__)
 
@@ -151,7 +150,7 @@ class Client:
         return getattr(self.__session.cookie_jar, "_cookies")
 
     @contextlib.asynccontextmanager
-    async def create(self) -> AsyncIterator[Self]:
+    async def create(self) -> AsyncIterator[Client]:
         """Creates a ClientSession instance in context and returns self.
 
         Creating ClientSession in context manager allows to safely shutdown

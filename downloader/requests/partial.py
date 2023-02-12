@@ -32,13 +32,15 @@ Examples:
     >>>         async with request.make(session) as response:
     >>>             pass  # All is fine
 """
+from __future__ import annotations
+
 import contextlib
 import copy
 import logging
 
 from collections.abc import AsyncIterator, Callable
 from dataclasses import dataclass
-from typing import Any, TypeAlias
+from typing import Any
 
 from aiohttp import ClientSession, ClientResponse
 
@@ -46,9 +48,6 @@ from .section import PartialSection
 
 
 Logger = logging.getLogger(__file__)
-
-# TODO: Alias to Self from Python 3.11
-Self: TypeAlias = "PartialRequest"
 
 
 @dataclass
@@ -149,7 +148,7 @@ class PartialRequest:
             kind: str,
             *,
             parameters: dict[str, str] | None = None,
-            automatic: dict[str, Callable[[], str]] | None = None) -> Self:
+            automatic: dict[str, Callable[[], str]] | None = None) -> PartialRequest:
         """Copies the `PartialRequest` with specified fields and their values in specified kind.
 
         When an existed kind section added, sets all fields and remove
@@ -199,7 +198,7 @@ class PartialRequest:
     def with_url_fields(self,
                         *,
                         parameters: dict[str, Any] | None = None,
-                        automatic: dict[str, Callable[[], Any]] | None = None) -> Self:
+                        automatic: dict[str, Callable[[], Any]] | None = None) -> PartialRequest:
         """Copies the `PartialRequest` with specified fields and their values in url section.
 
         The url section allows to use the url as a template (which must support

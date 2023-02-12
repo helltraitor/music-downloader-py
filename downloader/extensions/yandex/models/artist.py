@@ -1,11 +1,13 @@
 # Copyright (c) 2022 Helltraitor <helltraitor@hotmail.com>
 #
 # This file is under MIT License (see full license text in music-downloader-py/LICENSE file)
+from __future__ import annotations
+
 import logging
 import re
 
 from dataclasses import dataclass, field
-from typing import Optional, TypeAlias
+from typing import Optional
 
 from aiohttp.client import ClientSession
 
@@ -19,8 +21,6 @@ from ..options import TrackQuality
 
 Logger = logging.getLogger(__file__)
 
-Self: TypeAlias = "Artist"
-
 
 @dataclass
 class Artist(Expandable):
@@ -31,7 +31,7 @@ class Artist(Expandable):
     quality: TrackQuality = field(default=TrackQuality.STANDARD, repr=False)
 
     @staticmethod
-    def from_url(url: str) -> Optional[Self]:
+    def from_url(url: str) -> Optional[Artist]:
         """Creates a new instance from its url"""
         if album := re.search(r"artist/(\d*)", url):
             return Artist(album.group(1))

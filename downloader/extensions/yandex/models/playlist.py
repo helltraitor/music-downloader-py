@@ -1,6 +1,8 @@
 # Copyright (c) 2022 Helltraitor <helltraitor@hotmail.com>
 #
 # This file is under MIT License (see full license text in music-downloader-py/LICENSE file)
+from __future__ import annotations
+
 import logging
 import re
 
@@ -19,8 +21,6 @@ from ..options import TrackQuality
 
 Logger = logging.getLogger(__file__)
 
-Self: TypeAlias = "Playlist"
-
 
 @dataclass
 class Playlist(Expandable):
@@ -32,7 +32,7 @@ class Playlist(Expandable):
     quality: TrackQuality = field(default=TrackQuality.STANDARD)
 
     @staticmethod
-    def from_url(url: str) -> Optional[Self]:
+    def from_url(url: str) -> Optional[Playlist]:
         """Creates a new instance from its url"""
         if playlist := re.search(r"users/(.*)/playlists/(\d*)", url):
             return Playlist(playlist.group(1), playlist.group(2))

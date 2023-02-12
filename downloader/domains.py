@@ -26,17 +26,17 @@ Examples:
     >>>     def match(url: str) -> bool:
     >>>         return "example.com" in url
 """
+from __future__ import annotations
+
 import logging
 
 from abc import abstractmethod, ABC
-from typing import Protocol, runtime_checkable, Type, TypeAlias
+from typing import Protocol, runtime_checkable, Type
 
 from downloader.fetcher import Target
 
 
-Self: TypeAlias = "Domain"
-
-ALL: dict[str, Type[Self]] = {}
+ALL: dict[str, Type[Domain]] = {}
 
 Logger = logging.getLogger(__file__)
 
