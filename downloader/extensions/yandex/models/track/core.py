@@ -51,7 +51,7 @@ class Track(Downloadable):
             print("SKIP", self.meta.info.title)  # type: ignore
             raise IgnoredException(f"Track {self} is not available")
 
-        if not all((self.file, self.meta, self.meta)):
+        if self.file is None or self.meta is None:
             Logger.error("%s wasn't prepared by `prepare` method", self)
             raise RuntimeError(f"{self} wasn't prepared by `prepare` method")
 
@@ -129,8 +129,11 @@ class Track(Downloadable):
             Logger.error("%s wasn't prepared by `prepare_meta` method", self)
             raise RuntimeError(f"{self} wasn't prepared by `prepare_meta` method")
 
-        # Safe: Values self.meta was checked above
-        src = self.meta.cover.resource.replace("%%", self.quality.cover())  # type: ignore
+        if self.meta.cover is None or self.meta.cover.resource is None:
+            Logger.warning("Cover resource is unset for track %s in album %s", self.id, self.album)
+            return
+
+        src = self.meta.cover.resource.replace("%%", self.quality.cover())
         request = (api.TRACK_COVER_REQUEST
                       .with_url_fields(parameters={"src": src}))
 
@@ -149,8 +152,8 @@ class Track(Downloadable):
                 raise RuntimeError("Bad content type `application/octet-stream` (RFC2616)")
 
             # Safe: Values self.meta was checked above
-            self.meta.cover.content = await response.read()  # type: ignore
-            self.meta.cover.mimetype = response.headers["CONTENT-TYPE"]  # type: ignore
+            self.meta.cover.content = await response.read()
+            self.meta.cover.mimetype = response.headers["CONTENT-TYPE"]
         Logger.info("Cover was successfully prepared for %s", self)
 
     async def prepare_file(self, session: ClientSession) -> None:

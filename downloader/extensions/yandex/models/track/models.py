@@ -28,7 +28,7 @@ class TrackAlbum(BaseModel):
     genre: str = Field(default="")  # TCON
     labels: list[TrackLabel]
     position: TrackPosition = Field(alias="trackPosition")
-    release: datetime = Field(alias="releaseDate")  # TDRC
+    release: datetime | None = Field(alias="releaseDate", default=None)  # TDRC
     title: str  # TALB
     version: str | None
 
@@ -64,10 +64,11 @@ class TrackAlbum(BaseModel):
             # see mutagen _specs.py
             text=["/".join(dict.fromkeys(labels, None).keys())]))
 
-        file.tags.add(id3.TDRC(
-            encoding=3,  # 3 for UTF-8
-            # see mutagen _specs.py
-            text=[self.release.strftime("%Y-%m-%d %H:%M:%S")]))
+        if self.release is not None:
+            file.tags.add(id3.TDRC(
+                encoding=3,  # 3 for UTF-8
+                # see mutagen _specs.py
+                text=[self.release.strftime("%Y-%m-%d %H:%M:%S")]))
 
         file.tags.add(id3.TALB(
             encoding=3,  # 3 for UTF-8
@@ -145,7 +146,7 @@ class TrackInfo(BaseModel):
 class TrackCover(BaseModel):
     content: bytes | None = None  # APIC
     mimetype: str | None = None  # APIC
-    resource: str = Field(alias="coverUri", default=None)
+    resource: str | None = Field(alias="coverUri", default=None)
 
     def apply(self, file: FileType) -> None:
         """
@@ -242,4 +243,4 @@ class TrackFile(BaseModel):
     bitrate: int
     codec: str
     filepath: Path | None = None
-    resource: str = Field(alias="src", default=None)
+    resource: str | None = Field(alias="src", default=None)
