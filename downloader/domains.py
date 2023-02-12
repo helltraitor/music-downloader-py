@@ -77,7 +77,7 @@ class Domain(ABC):
         Logger.info("Domain %s was successfully registered", cls_name)
         ALL[cls_name.lower()] = cls
 
-    def activate(self, options: list[str]) -> None:
+    def activate(self, common_options: list[str], kwargs_options: dict[str, str]) -> None:
         """Setups the domain instance and activate supported options.
 
         Activates special features that supports by the domain (e.g. high quality).
@@ -85,10 +85,11 @@ class Domain(ABC):
         lower before checks.
 
         Args:
-            options: Options list provided by user.
+            common_options: Common, switch options list provided by user.
+            kwargs_options: Options with values provided by user.
         """
-        Logger.error("Domain %s is not support options %s", type(self).__name__, options)
-        raise ValueError(f"Domain {type(self).__name__} is not support options {options}")
+        Logger.error("Domain %s is not support options", type(self).__name__)
+        raise ValueError(f"Domain {type(self).__name__} is not support options")
 
     @staticmethod
     @abstractmethod

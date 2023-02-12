@@ -72,6 +72,7 @@ def fetch(context: click.Context,  # pylint: disable=locally-disabled, too-many-
         | downloader fetch <url> -d %USERPROFILE%/Downloads -c ignore
         | downloader fetch <url> -d %USERPROFILE%/Downloads -c ignore -l 8
         | downloader fetch <url> -d %USERPROFILE%/Downloads -o HighQuality -o RussianLyrics
+        | downloader fetch <url> -d %USERPROFILE%/Downloads -o HighQuality -o Displace=*
 
     \f
     Note (for documentation in `click` package):
@@ -115,11 +116,24 @@ def fetch(context: click.Context,  # pylint: disable=locally-disabled, too-many-
             raise RuntimeError(f"{name} cannot be used for fetching")
         separated[subclass] = acceptable
 
+    common_options = []
+    kwargs_options: dict[str, str] = {}
+
+    for option in options:
+        match option.count("="):
+            case 0:
+                common_options.append(option)
+            case 1:
+                key, value = option.split("=", 1)
+                kwargs_options[key] = value
+            case _:
+                Logger.error("Invalid option provided %s", option)
+                raise ValueError(f"Invalid option {option}: Option must have zero or one `=` symbol")
+
     activated = []
     for subclass, subtargets in separated.items():
         factory = subclass()
-        # SAFE: Subclass implements both Domain and Fetchable
-        factory.activate(list(options))  # type: ignore
+        factory.activate(common_options, kwargs_options)
         activated.extend([factory.fetch_from(target) for target in subtargets])
 
     # SAFE: Cookies ensures to be in main cli `click` function.

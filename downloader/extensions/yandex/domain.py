@@ -45,8 +45,8 @@ class Yandex(Domain, Fetchable):
     def match(url: str) -> bool:
         return bool(re.match(HOST_PATTERN, url))
 
-    def activate(self, options: list[str]) -> None:
-        for option in options:
+    def activate(self, common_options: list[str], kwargs_options: dict[str, str]) -> None:
+        for option in common_options:
             match option:
                 case "HQ" | "HighQuality":
                     self.quality = TrackQuality.HIGH
