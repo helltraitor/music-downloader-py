@@ -55,9 +55,12 @@ class Track(Downloadable):
             Logger.error("%s wasn't prepared by `prepare` method", self)
             raise RuntimeError(f"{self} wasn't prepared by `prepare` method")
 
-        # Receiving and processing download info
-        # Safe: Value self.file was checked above
-        src = self.file.resource.removeprefix("//")  # type: ignore
+        if self.file.resource is None:
+            Logger.warning("Unable to get resource link for track %s in album %s", self.id, self.album)
+            Logger.warning("Soft error while using Yandex: Probably api has changed")
+            raise IgnoredException(f"Unable to get resource of {self}")
+
+        src = self.file.resource.removeprefix("//")
         request = (api.TRACK_DOWN_REQUEST
                       .with_url_fields(parameters={"src": src}))
 
