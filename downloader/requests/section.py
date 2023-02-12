@@ -23,12 +23,9 @@ import logging
 
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import TypeAlias
+from typing import Self
 
 Logger = logging.getLogger(__file__)
-
-# TODO: Alias to Self from Python 3.11
-Self: TypeAlias = "PartialSection"
 
 
 @dataclass

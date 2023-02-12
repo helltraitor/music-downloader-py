@@ -32,14 +32,11 @@ import pickle
 
 from http.cookies import SimpleCookie
 from pathlib import Path
-from typing import TypeAlias
 
 import aiofiles
 
 
 Logger = logging.getLogger(__file__)
-
-Self: TypeAlias = "CookiesStorage"
 
 
 class CookiesStorage:
