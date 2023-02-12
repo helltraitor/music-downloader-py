@@ -14,7 +14,7 @@ Examples:
     >>> from downloader.filesystem import sanitize
     >>>
     >>>
-    >>> assert sanitize("/coolname!/") == "coolname!"
+    >>> assert sanitize("/coolname!/", "_") == "_coolname!_"
 """
 import hashlib
 import logging
@@ -25,7 +25,7 @@ from pathvalidate import sanitize_filename
 Logger = logging.getLogger(__file__)
 
 
-def sanitize(name: str) -> str:
+def sanitize(name: str, displace: str) -> str:
     """Sanitizes a name and makes it more reliable for os file system.
 
     This function can't provide any guarantees, because depends on `pathvalidate`
@@ -35,14 +35,22 @@ def sanitize(name: str) -> str:
 
     Args:
         name: A name that will be sanitized.
+        displace: String that will be used as replacement for invalid characters.
 
     Returns:
         str: A valid name or md5 hexdigit in case when name is invalid.
+
+    Raises:
+            ValueError: When displace doesn't pass sanitize check `sanitize(displace) != displace`
     """
+    if sanitize_filename(displace) != displace:
+        Logger.error("Invalid displace provided %s", displace)
+        raise ValueError(f"Invalid displace provided `{displace}`")
+
     try:
         sanitized = sanitize_filename(name,
                                       check_reserved=True,
-                                      replacement_text=" ")
+                                      replacement_text=displace)
     except ValueError as exc:
         Logger.error("Unable to sanitize filename `%s`", name, exc_info=exc)
         return hashlib.md5(name.encode("utf-8")).hexdigest()

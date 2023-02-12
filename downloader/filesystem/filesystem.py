@@ -19,12 +19,13 @@ Examples:
     >>>     async with downloads.open("test.txt").to_file() as file:
     >>>         await file.write(b"Music is cool")
 """
+from __future__ import annotations
+
 import contextlib
 import logging
 
 from collections.abc import AsyncIterator
 from pathlib import Path
-from typing import TypeAlias
 
 from .core import FileSystemConflict
 from .descriptor import Descriptor
@@ -32,8 +33,6 @@ from .sanitizer import sanitize
 
 
 Logger = logging.getLogger(__file__)
-
-Self: TypeAlias = "FileSystem"
 
 
 class FileSystem:
@@ -95,7 +94,7 @@ class FileSystem:
         return self.__root
 
     @contextlib.asynccontextmanager
-    async def into(self, dirname: str) -> AsyncIterator[Self]:
+    async def into(self, dirname: str, displace: str) -> AsyncIterator[FileSystem]:
         """Creates a new folder in the root and returns a new `FileSystem` it in context.
 
         Creates a new folder and created a new instance with this directory
@@ -116,14 +115,14 @@ class FileSystem:
 
         Args:
             dirname: A directory name that will be automatically sanitized.
+            displace: String that will be used as replacement for invalid characters.
 
         Yields:
             A new `FileSystem` instance in specified dir as the root dir.
         """
-        # SAFE: This is a mypy bug
-        yield FileSystem(self.__conflict, self.__root / sanitize(dirname))  # type: ignore
+        yield FileSystem(self.__conflict, self.__root / sanitize(dirname, displace))
 
-    def open(self, filename: str) -> Descriptor:
+    def open(self, filename: str, displace: str) -> Descriptor:
         """Returns a new `Descriptor` if no file exists otherwise raises exceptions.
 
         Action, when the same file already exists, depends on `FileSystemConflict`.
@@ -190,12 +189,13 @@ class FileSystem:
 
         Args:
             filename: The name of file that will be sanitized and used in `Descriptor`.
+            displace: String that will be used as replacement for invalid characters.
 
         Returns:
             A new `Descriptor` that allows to use a file as file or track.
         """
         # Ensures that indicated path exists
         self.__root.mkdir(exist_ok=True, parents=True)
-        filepath = self.__root / sanitize(filename)
+        filepath = self.__root / sanitize(filename, displace)
         Logger.debug("Trying to open file at %s", filepath)
         return Descriptor(filepath, self.__conflict)
