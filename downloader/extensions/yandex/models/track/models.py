@@ -27,7 +27,7 @@ class TrackAlbum(BaseModel):
     amount: int = Field(alias="trackCount")  # TRCK
     genre: str = Field(default="")  # TCON
     labels: list[TrackLabel]
-    position: TrackPosition = Field(alias="trackPosition")
+    position: TrackPosition = Field(alias="trackPosition", default_factory=lambda: TrackPosition(volume=0, index=0))
     release: datetime | None = Field(alias="releaseDate", default=None)  # TDRC
     title: str  # TALB
     version: str | None
